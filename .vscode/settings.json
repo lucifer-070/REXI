@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": ["."],
+    "python.analysis.pythonPath": ".",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    }
+}
