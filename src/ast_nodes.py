@@ -217,3 +217,24 @@ class BlockNode(Node):
 
     def __repr__(self):
         return f"BlockNode({self.statements!r})"
+
+
+class WhileNode(Node):
+    """
+    A while loop: repeatedly execute the body while the condition is truthy.
+
+    Example source:  while x > 0 then x = x - 1
+
+    Fields:
+        condition — boolean expression Node, evaluated before each iteration
+        body      — expression Node executed each iteration
+                    (can be an assignment, function call, or any expression)
+    """
+    def __init__(self, condition: Node, body: Node, line: int = 0, col: int = 0):
+        self.condition = condition
+        self.body      = body
+        self.line      = line
+        self.col       = col
+
+    def __repr__(self):
+        return f"WhileNode(condition={self.condition!r}, body={self.body!r})"
