@@ -233,6 +233,8 @@ class Lexer:
                 '>': TokenType.GT,
                 '(': TokenType.LPAREN,
                 ')': TokenType.RPAREN,
+                '{': TokenType.LBRACE,
+                '}': TokenType.RBRACE,
                 ',': TokenType.COMMA,
             }
             if ch in single_map:

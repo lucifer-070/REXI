@@ -49,6 +49,8 @@ class TokenType(Enum):
     # ── Delimiters ────────────────────────────────────────────
     LPAREN  = auto()   # (
     RPAREN  = auto()   # )
+    LBRACE  = auto()   # {  (block open)
+    RBRACE  = auto()   # }  (block close)
     COMMA   = auto()   # ,
     NEWLINE = auto()   # \n (statement separator)
     SEMICOL = auto()   # ;  (alternative statement separator)

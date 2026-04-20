@@ -220,10 +220,45 @@ class Parser:
         if self.current().type == TokenType.IDENTIFIER and self.current().value == 'then':
             self.advance()
 
-        body = self.parse_statement()
+        # Block body: while x > 0 { x = x - 1; print(x) }
+        if self.current().type == TokenType.LBRACE:
+            body = self.parse_block_body()
+        else:
+            body = self.parse_statement()
         return WhileNode(condition, body, tok.line, tok.col)
 
     # ── Expression hierarchy (precedence: low → high) ─────────────────────────
+
+
+    # ── Block body ────────────────────────────────────────────────────────────
+
+    def parse_block_body(self):
+        """
+        Parse a { stmt; stmt; ... } block into a BlockNode.
+
+        Statements are separated by newlines or semicolons.
+        Examples:
+            while cond { stmt1; stmt2 }
+            while cond {
+                stmt1
+                stmt2
+            }
+        """
+        tok = self.expect(TokenType.LBRACE)
+        self.skip_newlines()
+        statements = []
+        while self.current().type not in (TokenType.RBRACE, TokenType.EOF):
+            stmt = self.parse_statement()
+            if stmt is not None:
+                statements.append(stmt)
+            self.skip_newlines()
+        if self.current().type == TokenType.EOF:
+            raise ParseError(
+                "Unclosed block body — expected '}'",
+                tok.line, tok.col
+            )
+        self.expect(TokenType.RBRACE)
+        return BlockNode(statements, tok.line, tok.col)
 
     def parse_expression(self):
         return self.parse_or()
