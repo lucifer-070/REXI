@@ -119,6 +119,48 @@ class Lexer:
             return Token(TokenType.FALSE, False, line, col)
         return Token(tok_type, name, line, col)
 
+    def read_string(self, line: int, col: int) -> Token:
+        """
+        Read a double-quoted string literal.
+
+        Supports escape sequences:
+            \\n  → newline character
+            \\"  → literal double quote
+            \\\\ → literal backslash
+
+        Raises LexerError if the string is not closed before end-of-line or EOF.
+
+        Example source:  "hello"   "line1\\nline2"   "say \\"hi\\""
+        """
+        self.advance()          # consume the opening "
+        buf = []
+
+        while self.current_char is not None and self.current_char not in ('"', '\n'):
+            if self.current_char == '\\':
+                self.advance()  # consume the backslash
+                esc = self.current_char
+                if esc is None:
+                    raise LexerError("Unexpected end of file inside string", line, col)
+                elif esc == 'n':
+                    buf.append('\n')
+                elif esc == '"':
+                    buf.append('"')
+                elif esc == '\\':
+                    buf.append('\\')
+                else:
+                    raise LexerError(
+                        f"Unknown escape sequence '\\\\{esc}'", self.line, self.col
+                    )
+                self.advance()
+            else:
+                buf.append(self.advance())
+
+        if self.current_char != '"':
+            raise LexerError("Unterminated string literal", line, col)
+
+        self.advance()          # consume the closing "
+        return Token(TokenType.STRING, ''.join(buf), line, col)
+
     # ── Main tokenise loop ────────────────────────────────────────────────────
 
     def tokenize(self) -> list:
@@ -196,6 +238,11 @@ class Lexer:
             if ch in single_map:
                 self.advance()
                 tokens.append(Token(single_map[ch], ch, line, col))
+                continue
+
+            # ── String literal ────────────────────────────────
+            if ch == '"':
+                tokens.append(self.read_string(line, col))
                 continue
 
             # ── Unknown character ─────────────────────────────
