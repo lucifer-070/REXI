@@ -29,7 +29,7 @@ from src.ast_nodes import (
     NumberNode, BoolNode, VarAccessNode,
     BinOpNode, UnaryOpNode,
     VarAssignNode, FuncDefNode, FuncCallNode,
-    IfNode, ReturnNode, BlockNode,
+    IfNode, ReturnNode, BlockNode, WhileNode,
 )
 
 
@@ -125,6 +125,9 @@ class Parser:
         if tok.type == TokenType.IF:
             return self.parse_if()
 
+        if tok.type == TokenType.WHILE:
+            return self.parse_while()
+
         # Assignment: IDENTIFIER ASSIGN ...   vs just a bare expression
         if (tok.type == TokenType.IDENTIFIER
                 and self.peek().type == TokenType.ASSIGN):
@@ -196,6 +199,29 @@ class Parser:
             else_body = self.parse_expression()
 
         return IfNode(condition, then_body, else_body, tok.line, tok.col)
+
+    # ── While statement ───────────────────────────────────────────────────────
+
+    def parse_while(self) -> WhileNode:
+        """
+        Grammar rule:
+            while_stmt ::= WHILE expression [IDENTIFIER('then')] expression
+
+        'then' is optional — the parser accepts it if present but does not require it.
+
+        Examples:
+            while x > 0 then x = x - 1
+            while x > 0 x = x - 1        (no 'then', also valid)
+        """
+        tok = self.expect(TokenType.WHILE)
+        condition = self.parse_expression()
+
+        # Accept optional 'then' keyword (it reads as IDENTIFIER since there's no THEN token)
+        if self.current().type == TokenType.IDENTIFIER and self.current().value == 'then':
+            self.advance()
+
+        body = self.parse_statement()
+        return WhileNode(condition, body, tok.line, tok.col)
 
     # ── Expression hierarchy (precedence: low → high) ─────────────────────────
 
@@ -318,6 +344,10 @@ class Parser:
         # Nested if expression
         if tok.type == TokenType.IF:
             return self.parse_if()
+
+        # Allow 'while' as a nested expression
+        if tok.type == TokenType.WHILE:
+            return self.parse_while()
 
         raise ParseError(
             f"Unexpected token {tok.type.name} ({tok.value!r})",

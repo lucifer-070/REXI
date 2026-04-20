@@ -44,6 +44,7 @@ class TokenType(Enum):
     RETURN  = auto()   # return
     TRUE    = auto()   # true
     FALSE   = auto()   # false
+    WHILE   = auto()   # while
 
     # ── Delimiters ────────────────────────────────────────────
     LPAREN  = auto()   # (
@@ -67,6 +68,7 @@ KEYWORDS = {
     "return": TokenType.RETURN,
     "true":   TokenType.TRUE,
     "false":  TokenType.FALSE,
+    "while":  TokenType.WHILE,
 }
 
 

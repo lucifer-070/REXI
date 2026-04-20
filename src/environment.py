@@ -68,3 +68,32 @@ class Environment:
 
     def __repr__(self):
         return f"Environment({list(self._vars.keys())}, parent={'yes' if self.parent else 'none'})"
+
+    def dump(self, indent: int = 0) -> str:
+        """
+        Return a formatted string showing all variables defined in this scope
+        and all parent scopes. Used by the REPL's :env command.
+
+        Example output:
+            [local scope]
+              n = 5
+              result = 120
+            [global scope]
+              fact = <function fact>
+        """
+        lines = []
+        label = "global scope" if self.parent is None else "local scope"
+        lines.append(" " * indent + f"[{label}]")
+
+        for name, value in sorted(self._vars.items()):
+            # FuncDefNode objects have a 'params' attribute — show them nicely
+            if hasattr(value, 'params'):
+                display = f"<function {name}>"
+            else:
+                display = repr(value)
+            lines.append(" " * indent + f"  {name} = {display}")
+
+        if self.parent is not None:
+            lines.append(self.parent.dump(indent))
+
+        return "\n".join(lines)
