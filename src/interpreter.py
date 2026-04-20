@@ -14,7 +14,7 @@ from src.ast_nodes import (
     NumberNode, BoolNode, VarAccessNode,
     BinOpNode, UnaryOpNode,
     VarAssignNode, FuncDefNode, FuncCallNode,
-    IfNode, ReturnNode, BlockNode,
+    IfNode, ReturnNode, BlockNode, WhileNode,
 )
 from src.environment import Environment
 
@@ -263,6 +263,32 @@ class Interpreter:
         elif node.else_body is not None:
             return self.visit(node.else_body, env)
         return None
+
+    def visit_WhileNode(self, node: WhileNode, env: Environment):
+        """
+        Execute the body expression repeatedly while the condition is truthy.
+
+        Returns the last value produced by the body, or None if the body
+        never ran (condition was false from the start).
+
+        A safety cap of 100,000 iterations prevents accidental infinite loops
+        from hanging the REPL.
+        """
+        result    = None
+        max_iters = 100_000
+        iters     = 0
+
+        while self.visit(node.condition, env):
+            result  = self.visit(node.body, env)
+            iters  += 1
+            if iters >= max_iters:
+                raise REXIRuntimeError(
+                    f"While loop exceeded {max_iters} iterations — "
+                    f"possible infinite loop",
+                    node.line, node.col
+                )
+
+        return result
 
     def visit_ReturnNode(self, node: ReturnNode, env: Environment):
         value = self.visit(node.value, env)

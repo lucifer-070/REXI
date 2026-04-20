@@ -20,7 +20,7 @@ from src.ast_nodes import (
     NumberNode, BoolNode, VarAccessNode,
     BinOpNode, UnaryOpNode,
     VarAssignNode, FuncDefNode, FuncCallNode,
-    IfNode, ReturnNode, BlockNode,
+    IfNode, ReturnNode, BlockNode, WhileNode,
 )
 
 
@@ -69,6 +69,9 @@ def _node_label(node) -> tuple:
 
     if isinstance(node, BlockNode):
         return "Block", node.statements
+
+    if isinstance(node, WhileNode):
+        return "While", [('cond', node.condition), ('body', node.body)]
 
     return type(node).__name__, []
 
