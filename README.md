@@ -238,6 +238,7 @@ REXI
 | `:env` | Print all variables and functions defined in the current session |
 | `:tree <expr>` | Parse an expression and display its AST as an indented tree |
 | `:clear` | Reset the interpreter — clears all variables and functions |
+| `:builtins` | List all built-in functions |
 | `:exit` / `:quit` | Exit the REPL |
 
 #### Example — `:tree`

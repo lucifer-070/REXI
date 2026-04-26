@@ -342,6 +342,22 @@ Resets the interpreter — wipes all variables and functions:
 [RuntimeError]: Undefined variable 'x'
 ```
 
+### `:builtins`
+Lists all built-in functions available in REXI:
+```
+>> :builtins
+Built-in functions:
+  abs
+  ceil
+  floor
+  max
+  min
+  pow
+  print
+  round
+  sqrt
+```
+
 ### `:exit` / `:quit`
 Exits the REPL.
 

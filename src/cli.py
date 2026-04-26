@@ -18,7 +18,7 @@ import os
 
 from src.lexer import Lexer, LexerError
 from src.parser import Parser, ParseError
-from src.interpreter import Interpreter, REXIRuntimeError
+from src.interpreter import Interpreter, REXIRuntimeError, BUILTINS
 from src.ast_printer import print_ast
 
 
@@ -35,6 +35,7 @@ Special REPL commands:
   :env             Show all defined variables and functions
   :tree <expr>     Show the AST tree for an expression
   :clear           Reset interpreter (clears all variables and functions)
+  :builtins        List all built-in functions
   :help            Show this help message
 
 Language quick-reference:
@@ -98,6 +99,12 @@ def run_repl():
         if line == ":clear":
             interp = Interpreter()
             print("(interpreter reset — all variables cleared)")
+            continue
+
+        if line == ":builtins":
+            print("Built-in functions:")
+            for name in sorted(BUILTINS.keys()):
+                print(f"  {name}")
             continue
 
         if line.startswith(":tree"):
